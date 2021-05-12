@@ -118,6 +118,8 @@ class Contact {
     }
   }
 
+  Contact();
+
   @override
   String toString() {
     return "Contact(id: $id, name: $name, email: $email, phone: $phone, imG: $image)";
