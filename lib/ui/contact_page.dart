@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:contacts/helpers/contact_helper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 class ContactPage extends StatefulWidget {
@@ -92,6 +93,90 @@ class _ContactPageState extends State<ContactPage> {
     }
   }
 
+  void _showOptions(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return BottomSheet(
+            onClosing: () {},
+            builder: (context) {
+              return Container(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    FlatButton(
+                        onPressed: () {
+                          ImagePicker.pickImage(source: ImageSource.camera)
+                              .then((file) {
+                            if (file == null) return;
+                            setState(() {
+                              _editedContact.image = file.path;
+                            });
+                          });
+                          Navigator.pop(context);
+                        },
+                        color: Colors.pink[800],
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.all(5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Text(
+                                "Camera",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              ),
+                              Icon(
+                                Icons.camera,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        )),
+                    FlatButton(
+                        onPressed: () {
+                          ImagePicker.pickImage(source: ImageSource.gallery)
+                              .then((file) {
+                            if (file == null) return;
+                            setState(() {
+                              _editedContact.image = file.path;
+                            });
+                          });
+                          Navigator.pop(context);
+                        },
+                        color: Colors.pink[800],
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.all(5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Text(
+                                "Gallery",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              ),
+                              Icon(
+                                Icons.photo_album,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        )),
+                  ],
+                ),
+              );
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -130,7 +215,6 @@ class _ContactPageState extends State<ContactPage> {
             ),
           ),
           body: SingleChildScrollView(
-            padding: EdgeInsets.all(15),
             child: Column(
               children: <Widget>[
                 GestureDetector(
@@ -139,131 +223,145 @@ class _ContactPageState extends State<ContactPage> {
                     decoration: BoxDecoration(
                         shape: BoxShape.rectangle,
                         image: DecorationImage(
+                            fit: BoxFit.cover,
                             image: _editedContact.image != null
                                 ? FileImage(File(_editedContact.image))
                                 : AssetImage("images/user.png"))),
                   ),
+                  onTap: () {
+                    _showOptions(context);
+                  },
                 ),
                 Padding(
-                  padding: EdgeInsets.all(5),
-                  child: TextField(
-                    controller: _nameController,
-                    focusNode: _nameFocus,
-                    decoration: InputDecoration(
-                      labelText: "Name",
-                      labelStyle: TextStyle(
-                          color: Colors.pink[800], fontFamily: 'RobotoSlab'),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onChanged: (text) {
-                      setState(() {
-                        _userEdited = true;
-                        _editedContact.name = text;
-                      });
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      labelStyle: TextStyle(
-                          color: Colors.pink[800], fontFamily: 'RobotoSlab'),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onChanged: (text) {
-                      _userEdited = true;
-                      _editedContact.email = text;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: TextField(
-                    controller: _phoneController,
-                    decoration: InputDecoration(
-                      labelText: "Phone",
-                      labelStyle: TextStyle(
-                          color: Colors.pink[800], fontFamily: 'RobotoSlab'),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onChanged: (text) {
-                      _userEdited = true;
-                      _editedContact.phone = text;
-                    },
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(left: 5, right: 5),
-                      child: IconButton(
-                          icon: Icon(Icons.work),
-                          onPressed: () {
+                  padding: EdgeInsets.all(15),
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(5),
+                        child: TextField(
+                          controller: _nameController,
+                          focusNode: _nameFocus,
+                          decoration: InputDecoration(
+                            labelText: "Name",
+                            labelStyle: TextStyle(
+                                color: Colors.pink[800],
+                                fontFamily: 'RobotoSlab'),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onChanged: (text) {
                             setState(() {
-                              _editedContact.icon = 'work';
+                              _userEdited = true;
+                              _editedContact.name = text;
                             });
                           },
-                          iconSize: 40,
-                          color: _editedContact.icon == 'work'
-                              ? Colors.pink[800]
-                              : Colors.grey),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 5, right: 5),
-                      child: IconButton(
-                          icon: Icon(Icons.people),
-                          onPressed: () {
-                            setState(() {
-                              _editedContact.icon = 'people';
-                            });
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(5),
+                        child: TextField(
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            labelText: "Email",
+                            labelStyle: TextStyle(
+                                color: Colors.pink[800],
+                                fontFamily: 'RobotoSlab'),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onChanged: (text) {
+                            _userEdited = true;
+                            _editedContact.email = text;
                           },
-                          iconSize: 40,
-                          color: _editedContact.icon == 'people'
-                              ? Colors.pink[800]
-                              : Colors.grey),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.only(left: 5, right: 5),
-                        child: IconButton(
-                            icon: Icon(Icons.family_restroom),
-                            onPressed: () {
-                              setState(() {
-                                _editedContact.icon = 'family';
-                              });
-                            },
-                            iconSize: 40,
-                            color: _editedContact.icon == 'family'
-                                ? Colors.pink[800]
-                                : Colors.grey)),
-                    Padding(
-                      padding: EdgeInsets.only(left: 5, right: 5),
-                      child: IconButton(
-                          icon: Icon(Icons.school),
-                          onPressed: () {
-                            setState(() {
-                              _editedContact.icon = 'school';
-                            });
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(5),
+                        child: TextField(
+                          controller: _phoneController,
+                          decoration: InputDecoration(
+                            labelText: "Phone",
+                            labelStyle: TextStyle(
+                                color: Colors.pink[800],
+                                fontFamily: 'RobotoSlab'),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onChanged: (text) {
+                            _userEdited = true;
+                            _editedContact.phone = text;
                           },
-                          iconSize: 40,
-                          color: _editedContact.icon == 'school'
-                              ? Colors.pink[800]
-                              : Colors.grey),
-                    )
-                  ],
-                ),
-                Text(
-                  _getIconLabel(_editedContact.icon),
-                  style: TextStyle(
-                      color: Colors.pink[800],
-                      fontSize: 35,
-                      fontFamily: 'RobotoSlab'),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 5, right: 5),
+                            child: IconButton(
+                                icon: Icon(Icons.work),
+                                onPressed: () {
+                                  setState(() {
+                                    _editedContact.icon = 'work';
+                                  });
+                                },
+                                iconSize: 40,
+                                color: _editedContact.icon == 'work'
+                                    ? Colors.pink[800]
+                                    : Colors.grey),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 5, right: 5),
+                            child: IconButton(
+                                icon: Icon(Icons.people),
+                                onPressed: () {
+                                  setState(() {
+                                    _editedContact.icon = 'people';
+                                  });
+                                },
+                                iconSize: 40,
+                                color: _editedContact.icon == 'people'
+                                    ? Colors.pink[800]
+                                    : Colors.grey),
+                          ),
+                          Padding(
+                              padding: EdgeInsets.only(left: 5, right: 5),
+                              child: IconButton(
+                                  icon: Icon(Icons.family_restroom),
+                                  onPressed: () {
+                                    setState(() {
+                                      _editedContact.icon = 'family';
+                                    });
+                                  },
+                                  iconSize: 40,
+                                  color: _editedContact.icon == 'family'
+                                      ? Colors.pink[800]
+                                      : Colors.grey)),
+                          Padding(
+                            padding: EdgeInsets.only(left: 5, right: 5),
+                            child: IconButton(
+                                icon: Icon(Icons.school),
+                                onPressed: () {
+                                  setState(() {
+                                    _editedContact.icon = 'school';
+                                  });
+                                },
+                                iconSize: 40,
+                                color: _editedContact.icon == 'school'
+                                    ? Colors.pink[800]
+                                    : Colors.grey),
+                          )
+                        ],
+                      ),
+                      Text(
+                        _getIconLabel(_editedContact.icon),
+                        style: TextStyle(
+                            color: Colors.pink[800],
+                            fontSize: 35,
+                            fontFamily: 'RobotoSlab'),
+                      )
+                    ],
+                  ),
                 )
               ],
             ),
