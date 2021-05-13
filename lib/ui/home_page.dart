@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:contacts/helpers/contact_helper.dart';
+import 'package:contacts/ui/contact_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,11 +17,37 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    setState(() {
-      helper.getAllContacts().then((list) {
-        contacts = list;
-      });
-    });
+    _getAllContacts();
+  }
+
+  String _getIconLabel(String icon) {
+    switch (icon) {
+      case 'work':
+        return 'Work';
+      case 'people':
+        return 'Friends';
+      case 'family':
+        return 'Family';
+      case 'school':
+        return 'School';
+      default:
+        return 'Friends';
+    }
+  }
+
+  Icon _getIcon(String icon) {
+    switch (icon) {
+      case 'work':
+        return Icon(Icons.work);
+      case 'people':
+        return Icon(Icons.people);
+      case 'family':
+        return Icon(Icons.family_restroom);
+      case 'school':
+        return Icon(Icons.school);
+      default:
+        return Icon(Icons.people);
+    }
   }
 
   Widget _contactCard(BuildContext context, int index) {
@@ -43,11 +70,41 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
                       contacts[index].name ?? '',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'RobotoSlab',
+                          color: Colors.pink[800]),
+                    ),
+                    Text(
+                      contacts[index].email ?? '',
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      contacts[index].phone ?? '',
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        _getIcon(contacts[index].icon),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Text(
+                            _getIconLabel(contacts[index].icon),
+                            style: TextStyle(
+                                color: Colors.pink[800],
+                                fontFamily: 'RobotoSlab'),
+                          ),
+                        )
+                      ],
                     )
                   ],
                 ),
@@ -56,7 +113,37 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+      onTap: () {
+        _showContactPage(contact: contacts[index]);
+      },
     );
+  }
+
+  void _showContactPage({Contact contact}) async {
+    final recContact = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ContactPage(
+                  contact: contact,
+                )));
+
+    if (recContact != null) {
+      if (contact != null) {
+        await helper.updateContact(recContact);
+      } else {
+        await helper.saveContact(recContact);
+      }
+    }
+
+    _getAllContacts();
+  }
+
+  void _getAllContacts() {
+    helper.getAllContacts().then((list) {
+      setState(() {
+        contacts = list;
+      });
+    });
   }
 
   @override
@@ -84,7 +171,9 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         elevation: 10,
-        onPressed: () {},
+        onPressed: () {
+          _showContactPage();
+        },
         child: Icon(Icons.add),
         backgroundColor: Colors.pink[800],
       ),
