@@ -7,6 +7,7 @@ final String nameColumn = 'nameColumn';
 final String emailColumn = 'emailColumn';
 final String phoneColumn = 'phoneColumn';
 final String imageColumn = 'imageColumn';
+final String iconColumn = 'iconColumn';
 
 class ContactHelper {
   static final ContactHelper _instance = ContactHelper.internal();
@@ -34,7 +35,7 @@ class ContactHelper {
         onCreate: (Database db, int newerVersin) async {
       await db.execute(
           'CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT,'
-          '$phoneColumn TEXT, $imageColumn TEXT)');
+          '$phoneColumn TEXT, $imageColumn TEXT, $iconColumn TEXT)');
     });
   }
 
@@ -49,7 +50,14 @@ class ContactHelper {
   Future<Contact> getContact(int id) async {
     Database dbContact = await db;
     List<Map> maps = await dbContact.query(contactTable,
-        columns: [idColumn, nameColumn, emailColumn, phoneColumn, imageColumn],
+        columns: [
+          idColumn,
+          nameColumn,
+          emailColumn,
+          phoneColumn,
+          imageColumn,
+          iconColumn
+        ],
         where: "$idColumn = ?",
         whereArgs: [id]);
     if (maps.length > 0) {
@@ -99,6 +107,7 @@ class Contact {
   String email;
   String phone;
   String image;
+  String icon;
 
   Contact.fromMap(Map map) {
     id = map[idColumn];
@@ -106,6 +115,7 @@ class Contact {
     phone = map[phoneColumn];
     image = map[imageColumn];
     email = map[emailColumn];
+    icon = map[iconColumn];
   }
 
   Map toMap() {
@@ -114,6 +124,7 @@ class Contact {
       emailColumn: email,
       phoneColumn: phone,
       imageColumn: image,
+      iconColumn: icon
     };
     if (id != null) {
       map[idColumn] = id;
@@ -125,6 +136,6 @@ class Contact {
 
   @override
   String toString() {
-    return "Contact(id: $id, name: $name, email: $email, phone: $phone, imG: $image)";
+    return "Contact(id: $id, name: $name, email: $email, phone: $phone, imG: $image, icon: $icon)";
   }
 }
