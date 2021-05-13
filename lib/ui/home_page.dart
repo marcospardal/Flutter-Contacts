@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:contacts/helpers/contact_helper.dart';
 import 'package:contacts/ui/contact_page.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -132,7 +133,10 @@ class _HomePageState extends State<HomePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     FlatButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          launch("tel:${contacts[index].phone}");
+                          Navigator.pop(context);
+                        },
                         color: Colors.green[700],
                         child: Container(
                           decoration: BoxDecoration(
@@ -257,15 +261,6 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(
               fontFamily: 'RobotoSlab', fontSize: 30, color: Colors.pink[800]),
         ),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: Icon(
-              Icons.menu,
-              color: Colors.pink[800],
-            ),
-          )
-        ],
       ),
       floatingActionButton: FloatingActionButton(
         elevation: 10,
